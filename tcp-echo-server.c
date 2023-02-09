@@ -45,25 +45,25 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    struct sockaddr_in myAddr, clientAddr;
+    struct sockaddr_in server_addr, client_addr;
     int socketFd, clientFd;
-    unsigned int clientAddrLen = sizeof(clientAddr);
+    unsigned int client_addr_len = sizeof(client_addr);
 
-    memset(&clientAddr, 0, sizeof(clientAddr));
-    memset(&myAddr, 0, sizeof(myAddr));
-    myAddr.sin_family = AF_INET;
-    myAddr.sin_port = htons(atoi(argv[1]));
-    myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    memset(&client_addr, 0, sizeof(client_addr));
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(atoi(argv[1]));
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     socketFd = socket(AF_INET, SOCK_STREAM, 0);
-    bind(socketFd, (struct sockaddr *)&myAddr, sizeof(myAddr));
+    bind(socketFd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     listen(socketFd, 5);
     while (1)
     {
-        clientFd = accept(socketFd, (struct sockaddr *)&clientAddr, &clientAddrLen);
+        clientFd = accept(socketFd, (struct sockaddr *)&client_addr, &client_addr_len);
         pthread_t t;
         struct Client *c = (struct Client *)malloc(sizeof(struct Client));
-        memcpy(&c->client_addr, &clientAddr, sizeof(clientAddr));
+        memcpy(&c->client_addr, &client_addr, sizeof(client_addr));
         c->client_fd = clientFd;
         pthread_create(&t, NULL, handle_client, c);
     }
